@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         return grunt.log.warn('Destination not written because minified CSS was empty.');
       }
 
-      if (options.sourceMap) {
+      if (options.sourceMap && min.sourceMap) {
         min.sourceMap._file = path.basename(file.dest);
         grunt.file.write(file.dest, min.styles + '/*# sourceMappingURL=' + path.relative(path.dirname(file.dest), file.dest + '.map') + ' */');
         grunt.file.write(file.dest + '.map', min.sourceMap.toString());
