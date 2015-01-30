@@ -24,6 +24,9 @@ module.exports = function(grunt) {
     },
     cssmin: {
       compress: {
+        options: {
+          sourceMap: false
+        },
         files: {
           'tmp/style.css': [
             'test/fixtures/input_one.css',
@@ -32,6 +35,9 @@ module.exports = function(grunt) {
         }
       },
       empty: {
+        options: {
+          sourceMap: false
+        },
         files: {
           'tmp/idontexist.css': [
             'test/fixtures/idontexist.css'
@@ -39,8 +45,19 @@ module.exports = function(grunt) {
         }
       },
       inlineImport: {
+        options: {
+          sourceMap: false
+        },
         files: {
           'tmp/inline_import.css': [
+            'test/fixtures/input_inline_import.css',
+            'test/fixtures/inner/input_inline_import.css'
+          ]
+        }
+      },
+      sourceMap: {
+        files: {
+          'tmp/source_map.css': [
             'test/fixtures/input_inline_import.css',
             'test/fixtures/inner/input_inline_import.css'
           ]

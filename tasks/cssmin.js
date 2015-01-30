@@ -11,7 +11,6 @@ var path = require('path');
 var CleanCSS = require('clean-css');
 var chalk = require('chalk');
 var maxmin = require('maxmin');
-var Concat = require('concat-with-sourcemaps');
 var _ = require('lodash');
 
 module.exports = function(grunt) {
@@ -42,40 +41,30 @@ module.exports = function(grunt) {
         }
       });
 
-      var concat = new Concat(true, file.dest, options.separator);
-
-      var max = valid.map(function(file) {
-        var src = grunt.file.read(file);
-
-        var srcMap;
-        if (typeof options.sourceMap === 'string' && grunt.file.exists(options.sourceMap)) {
-          srcMap = grunt.file.read(options.sourceMap);
-        }
-        else if (options.sourceMap === true && grunt.file.exists(file + '.map')) {
-          srcMap = grunt.file.read(file + '.map');
-        }
-
-        var min = minify(src, _.merge(options, {
-          sourceMap: srcMap,
-          relativeTo: path.dirname(file)
-        }));
-
-        concat.add(file, min.styles, min.sourceMap);
-
+      var max = valid.map(function(srcFile) {
+        var src = grunt.file.read(srcFile);
         return src;
       }).join('');
 
-      if (concat.content.toString().length === 0) {
+      var minOptions = _.merge(options, {
+        target: file.dest
+      });
+
+      var min = minify(valid, minOptions);
+
+      if (min.styles.toString().length === 0) {
         return grunt.log.warn('Destination not written because minified CSS was empty.');
       }
 
-      grunt.file.write(file.dest, concat.content.toString());
-
       if (options.sourceMap) {
-        grunt.file.write(file.dest + '.map', concat.sourceMap);
+        min.sourceMap._file = path.basename(file.dest);
+        grunt.file.write(file.dest, min.styles + '/*# sourceMappingURL=' + path.relative(path.dirname(file.dest), file.dest + '.map') + ' */');
+        grunt.file.write(file.dest + '.map', min.sourceMap.toString());
+      } else {
+        grunt.file.write(file.dest, min.styles);
       }
 
-      grunt.verbose.writeln('File ' + chalk.cyan(file.dest) + ' created: ' + maxmin(max, concat.content.toString(), options.report === 'gzip'));
+      grunt.verbose.writeln('File ' + chalk.cyan(file.dest) + ' created: ' + maxmin(max, min.styles.toString(), options.report === 'gzip'));
     });
   });
 };

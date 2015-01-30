@@ -30,8 +30,8 @@ exports.cssmin = {
   sourceMaps: function(test) {
     test.expect(1);
 
-    var expect = grunt.file.read('test/expected/inline_import.css.map');
-    var result = grunt.file.read('tmp/inline_import.css.map');
+    var expect = grunt.file.read('test/expected/source_map.css.map');
+    var result = grunt.file.read('tmp/source_map.css.map');
     test.equal(expect, result, 'should generate sourcemap');
 
     test.done();
